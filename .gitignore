@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.db
+*.sqlite3
+
+# Env
+.env
+!.env.example
+
+# Node
+node_modules/
+.next/
+frontend/.next/
+
+# Spool / logs
+agent/spool/*.jsonl
+*.log
+
+# OS
+.DS_Store
