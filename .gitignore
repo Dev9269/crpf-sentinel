@@ -9,7 +9,13 @@ venv/
 
 # Env
 .env
+.env.local
 !.env.example
+!.env.local.example
+
+# DB WAL
+*.db-shm
+*.db-wal
 
 # Node
 node_modules/
