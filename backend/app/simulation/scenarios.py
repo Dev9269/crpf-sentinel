@@ -46,17 +46,6 @@ SCENARIOS = {
 }
 
 
-EVENT_COUNTS = {
-    "brute_force": 10,
-    "audit_clear": 1,
-    "new_service": 1,
-    "powershell": 1,
-    "user_created": 1,
-    "credential_dumping": 3,
-    "lateral_movement": 4,
-}
-
-
 def _pick_agent(db: Session) -> tuple[Agent, Unit]:
     agent = (
         db.query(Agent)
@@ -91,14 +80,17 @@ def run_scenario(db: Session, scenario: str) -> dict:
     rng = random.Random()
     now = datetime.now(timezone.utc)
     source_ip = rng.choice(["203.0.113.77", "198.51.100.33", "192.0.2.101"])
-    user = rng.choice(["administrator", "s.verma", "a.singh"])
+    user = rng.choice(["administrator", "s.verma", "a.singh", "r.khan", "p.mishra", "n.iyer"])
     alert_ids: list[str] = []
+    events_ingested = 0
 
     def run(events: list[dict]):
+        nonlocal events_ingested
         for ev in events:
             payload = _payload(ev["event_id"], agent.hostname, ev["when"], ev.get("data") or {})
             result = ingest_payload(db, payload, agent=agent, unit=unit)
             alert_ids.extend(result.get("new_alert_ids", []))
+            events_ingested += 1
 
     if scenario == "brute_force":
         base = now - timedelta(minutes=2)
@@ -174,7 +166,7 @@ def run_scenario(db: Session, scenario: str) -> dict:
     return {
         "scenario": scenario,
         "name": SCENARIOS[scenario]["name"],
-        "events_ingested": EVENT_COUNTS.get(scenario, 1),
+        "events_ingested": events_ingested,
         "alerts_triggered": len(set(alert_ids)),
         "alert_ids": list(dict.fromkeys(alert_ids)),
         "explanation": SCENARIOS[scenario]["explanation"],
