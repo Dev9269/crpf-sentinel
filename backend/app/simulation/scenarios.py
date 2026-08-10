@@ -35,6 +35,25 @@ SCENARIOS = {
         "name": "New User Account Created (4720)",
         "explanation": "A new local account was created.",
     },
+    "credential_dumping": {
+        "name": "Credential Dumping via LSASS Access (4663)",
+        "explanation": "A process opened lsass.exe with a memory-read access mask, consistent with credential dumping tools.",
+    },
+    "lateral_movement": {
+        "name": "Lateral Movement - Network Logon Sprawl (4624)",
+        "explanation": "Successive Logon Type 3 network logons for one account across multiple hosts in a short window.",
+    },
+}
+
+
+EVENT_COUNTS = {
+    "brute_force": 10,
+    "audit_clear": 1,
+    "new_service": 1,
+    "powershell": 1,
+    "user_created": 1,
+    "credential_dumping": 3,
+    "lateral_movement": 4,
 }
 
 
@@ -123,11 +142,39 @@ def run_scenario(db: Session, scenario: str) -> dict:
             "event_id": 4720, "when": now,
             "data": {"NewAccountName": "svc_temp", "SubjectUserName": "administrator"},
         }])
+    elif scenario == "credential_dumping":
+        base = now - timedelta(seconds=30)
+        events = [
+            {
+                "event_id": 4663,
+                "when": base + timedelta(seconds=8 * i),
+                "data": {
+                    "SubjectUserName": user,
+                    "ObjectName": "C:\\Windows\\System32\\lsass.exe",
+                    "AccessMask": "0x1010",
+                    "Process Name": "C:\\Users\\Public\\mimikatz.exe",
+                },
+            }
+            for i in range(3)
+        ]
+        run(events)
+    elif scenario == "lateral_movement":
+        base = now - timedelta(minutes=1)
+        hosts = ["10.10.4.11", "10.10.4.22", "10.10.7.9", "10.10.12.3"]
+        events = [
+            {
+                "event_id": 4624,
+                "when": base + timedelta(seconds=8 * i),
+                "data": {"SubjectUserName": user, "IpAddress": ip, "LogonType": "3"},
+            }
+            for i, ip in enumerate(hosts)
+        ]
+        run(events)
 
     return {
         "scenario": scenario,
         "name": SCENARIOS[scenario]["name"],
-        "events_ingested": 10 if scenario == "brute_force" else 1,
+        "events_ingested": EVENT_COUNTS.get(scenario, 1),
         "alerts_triggered": len(set(alert_ids)),
         "alert_ids": list(dict.fromkeys(alert_ids)),
         "explanation": SCENARIOS[scenario]["explanation"],

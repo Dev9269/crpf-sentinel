@@ -148,4 +148,38 @@ BUILTIN_RULES = [
         "mitre_technique": "T1059.001",
         "mitre_name": "PowerShell",
     },
+    {
+        "rule_id": "RULE-CRED-002",
+        "name": "LSASS Process Access (Credential Dumping)",
+        "description": "A process opened lsass.exe with a memory-read access mask (4663), consistent with credential dumping tools (mimikatz, procdump, comsvcs, rundll32, sqldumper).",
+        "category": "credential_access",
+        "severity": "high",
+        "event_id": [4663],
+        "conditions": {
+            "process_name": {
+                "contains_any": ["mimikatz", "procdump", "comsvcs", "rundll32", "sqldumper"]
+            }
+        },
+        "correlation_type": "none",
+        "threshold": 1,
+        "time_window_seconds": 60,
+        "correlation_key": None,
+        "mitre_technique": "T1003.001",
+        "mitre_name": "LSASS Memory",
+    },
+    {
+        "rule_id": "RULE-LAT-001",
+        "name": "Network Logon Sprawl (Lateral Movement)",
+        "description": "Four or more network logons (Logon Type 3) for the same account within 5 minutes suggest lateral movement across hosts.",
+        "category": "lateral_movement",
+        "severity": "critical",
+        "event_id": [4624],
+        "conditions": {"logon_type": {"eq": "3"}},
+        "correlation_type": "count",
+        "threshold": 4,
+        "time_window_seconds": 300,
+        "correlation_key": "username",
+        "mitre_technique": "T1021.002",
+        "mitre_name": "SMB/Windows Admin Shares",
+    },
 ]

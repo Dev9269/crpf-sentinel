@@ -102,15 +102,29 @@ make agent        # simulated agent (needs AGENT_API_TOKEN=...)
 2. Register a demo agent (**Agents** → **Register**) and run
    `make agent AGENT_API_TOKEN=<token>`.
 3. Watch the **Live Events** feed populate as the simulated agent ships events.
-4. Open **Demo Lab** (`/demo`) and run an attack scenario (e.g.
-   *Brute Force*, *Privilege Escalation*, *Credential Dumping*, *Lateral
-   Movement*, *Ransomware*) — synthetic events stream in and alerts fire.
+4. Open **Demo Lab** (`/demo`) and run an attack scenario — synthetic events
+   stream in and alerts fire. The implemented scenarios are:
+
+   | Scenario ID        | Detection            | Event ID(s)                        | MITRE ATT&CK            |
+   |--------------------|----------------------|------------------------------------|-------------------------|
+   | `brute_force`      | Brute Force          | 4625 ×10 → 4624                    | T1110 (Brute Force)     |
+   | `audit_clear`      | Security Audit Log Cleared | 1102                          | T1070.001 (Clear Event Logs) |
+   | `new_service`      | New Service Installed | 7045                              | T1543.003 (Windows Service) |
+   | `powershell`       | Suspicious PowerShell | 4688                              | T1059.001 (PowerShell)  |
+   | `user_created`     | New User Account     | 4720                              | T1136.001 (Local Account) |
+   | `credential_dumping` | LSASS Access       | 4663 (lsass access pattern)       | T1003.001 (LSASS Memory) |
+   | `lateral_movement` | Network Logon Sprawl | 4624 Logon Type 3 ×4              | T1021.002 (SMB/Admin Shares) |
+
+   You can also fire a scenario from the command line:
+   `make simulate` (defaults to `brute_force`) or
+   `make simulate SCENARIO=credential_dumping`.
 5. Triage alerts in **Alerts**, correlate with **Logs**, and export **Reports**.
 6. Open **Incidents** (`/incidents`) — seeded demo incidents group related
    alerts with notes and event timelines; drive the workflow to *closed*.
 7. Open **IOC Library** (`/ioc-library`) — indicators are matched against
-   inbound events during detection (try `203.0.113.14` from the brute-force
-   scenario); **MITRE ATT&CK** (`/mitre`) shows technique coverage.
+   inbound events during detection (the seeded IOC `198.51.100.7` is one of
+   the sources the `brute_force` scenario can emit); **MITRE ATT&CK**
+   (`/mitre`) shows technique coverage.
 8. Use **Search** (`/search`) for a global lookup across events, alerts,
    incidents, rules, IOCs, agents and units.
 

@@ -1,4 +1,4 @@
-.PHONY: up down logs backend frontend seed demo test agent
+.PHONY: up down logs backend frontend seed demo simulate test agent
 
 up: ## Start full stack (postgres + backend + frontend)
 	docker compose up -d --build
@@ -18,8 +18,10 @@ frontend: ## Run frontend locally
 seed: ## Seed demo data + rules
 	cd backend && python -m app.seed.seed_all
 
-simulate: ## Run demo attack scenario 1 (brute force)
-	cd backend && python -m app.simulation.run 1
+SCENARIO ?= brute_force
+
+simulate: ## Run a demo attack scenario (default: brute_force, override with make simulate SCENARIO=powershell)
+	cd backend && python -m app.simulation.run $(SCENARIO)
 
 agent: ## Run the Windows collector agent (needs SENTINEL_API_TOKEN)
 	cd agent && pip install -r requirements.txt && SENTINEL_API_TOKEN="$(AGENT_API_TOKEN)" python -m main --simulate

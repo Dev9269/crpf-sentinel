@@ -57,6 +57,22 @@ const SCENARIO_META: Record<string, Omit<ScenarioMeta, "id" | "name" | "explanat
     severity: "medium",
     detail: "Persistence",
   },
+  credential_dumping: {
+    short: "CREDENTIAL DUMPING",
+    eventIds: [4663],
+    eventLabel: "4663 ×3",
+    mitre: "T1003.001",
+    severity: "high",
+    detail: "Credential Access",
+  },
+  lateral_movement: {
+    short: "LATERAL MOVEMENT",
+    eventIds: [4624],
+    eventLabel: "4624 ×4 · LT3",
+    mitre: "T1021.002",
+    severity: "critical",
+    detail: "Lateral Movement",
+  },
 };
 
 export default function DemoPage() {
@@ -258,7 +274,7 @@ export default function DemoPage() {
                   score.
                 </p>
                 <div className="rounded border border-border bg-surface3 p-2.5 font-mono text-[10px] leading-relaxed text-slate-400">
-                  17 Failed Logins
+                  10 Failed Logins
                   <ArrowRight className="inline h-3 w-3 text-accent" /> Detection Triggered
                   <br />
                   T1110 Brute Force
