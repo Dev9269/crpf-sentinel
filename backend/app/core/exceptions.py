@@ -30,6 +30,11 @@ class UnauthorizedError(ApiError):
         super().__init__(code, message, status.HTTP_401_UNAUTHORIZED)
 
 
+class TooManyRequestsError(ApiError):
+    def __init__(self, code: str = "RATE_LIMITED", message: str = "Too many requests. Try again later."):
+        super().__init__(code, message, status.HTTP_429_TOO_MANY_REQUESTS)
+
+
 class ConflictError(ApiError):
     def __init__(self, code: str = "CONFLICT", message: str = "Resource already exists"):
         super().__init__(code, message, status.HTTP_409_CONFLICT)

@@ -1,4 +1,4 @@
-# CRPF SENTINEL
+# CRPF CYBERRAKSHAK
 
 A Security Information and Event Management (SIEM) platform for Central
 Reserve Police Force (CRPF) units — submitted for **Smart India Hackathon
@@ -93,7 +93,7 @@ make agent        # simulated agent (needs AGENT_API_TOKEN=...)
 
 | Role            | Username   | Password      |
 |-----------------|------------|---------------|
-| Super admin     | `admin`    | `Sentinel@123`|
+| Super admin     | `admin`    | `CyberRakshak@123`|
 | Security expert | `analyst`  | `Analyst@123` |
 
 ### Demo runbook
@@ -136,11 +136,11 @@ Backend (`.env`, see `backend/.env.example`):
 
 | Variable                  | Default                  | Notes                          |
 |---------------------------|--------------------------|--------------------------------|
-| `DATABASE_URL`            | Postgres (docker)        | use `sqlite:///./sentinel.db`  |
+| `DATABASE_URL`            | Postgres (docker)        | use `sqlite:///./cyberrakshak.db`  |
 | `JWT_SECRET`              | change-me…               | long random secret             |
 | `SEED_DEMO_DATA`          | `true`                   | seed demo units/agents/logs    |
 | `SEED_ADMIN_USERNAME`     | `admin`                  | seeded super-admin             |
-| `SEED_ADMIN_PASSWORD`     | `Sentinel@123`           | seeded password                |
+| `SEED_ADMIN_PASSWORD`     | `CyberRakshak@123`       | seeded password                |
 
 Agent (`SENTINEL_*` env vars override `agent/config/agent.yaml`):
 
@@ -154,6 +154,12 @@ Agent (`SENTINEL_*` env vars override `agent/config/agent.yaml`):
 | `SENTINEL_POLL_INTERVAL_SECONDS` | `5`             | collect/flush cadence          |
 | `SENTINEL_MAX_BATCH`        | `200`                  | events per ingest request (≤2000) |
 | `SENTINEL_SPOOL_DIR`        | `spool`                | offline JSONL buffer           |
+
+> **Naming note.** The product is branded **CyberRakshak**. "Sentinel" is retained
+> intentionally as an *internal codename* only — the agent env prefix
+> (`SENTINEL_*`), Python loggers, browser storage keys, and the package name
+> (`crpf-sentinel-frontend`) still use it because renaming those would break
+> deployed agents and stored sessions for zero user-visible benefit.
 
 ---
 

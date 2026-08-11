@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     # Core
-    APP_NAME: str = "CRPF Sentinel"
+    APP_NAME: str = "CRPF CyberRakshak"
     APP_VERSION: str = "1.0.0"
     APP_ENV: str = "development"
     API_PREFIX: str = "/api"
@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     AGENT_TOKEN_BYTES: int = 32
 
     # Database
-    DATABASE_URL: str = "sqlite:///./sentinel.db"
+    DATABASE_URL: str = "sqlite:///./cyberrakshak.db"
 
     # CORS
     BACKEND_CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
@@ -50,8 +50,8 @@ class Settings(BaseSettings):
     # Seeding
     SEED_DEMO_DATA: bool = True
     SEED_ADMIN_USERNAME: str = "admin"
-    SEED_ADMIN_EMAIL: str = "admin@sentinel.crpf.demo"
-    SEED_ADMIN_PASSWORD: str = "Sentinel@123"
+    SEED_ADMIN_EMAIL: str = "admin@cyberrakshak.crpf.demo"
+    SEED_ADMIN_PASSWORD: str = "CyberRakshak@123"
 
     @property
     def cors_origins(self) -> list[str]:

@@ -1,4 +1,4 @@
-"""CRPF SENTINEL — FastAPI application entrypoint."""
+"""CRPF CYBERRAKSHAK — FastAPI application entrypoint."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,7 +13,7 @@ settings = get_settings()
 _expose_docs = settings.APP_ENV != "production"
 
 app = FastAPI(
-    title="CRPF Sentinel API",
+    title="CRPF CyberRakshak API",
     description=(
         "Centralized IT System Log Analysis & Threat Detection Platform. "
         "Windows Event Log ingestion, normalization, signature detection, "

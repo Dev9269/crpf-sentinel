@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.deps import client_ip, get_current_user
-from app.core.exceptions import UnauthorizedError
+from app.core.exceptions import TooManyRequestsError, UnauthorizedError
 from app.core.rate_limit import RateLimiter
 from app.core.security import create_access_token, hash_password, verify_password
 from app.database.session import get_db
@@ -34,7 +34,7 @@ def _is_placeholder_account(user: User) -> bool:
 def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
     key = f"login:{client_ip(request)}:{body.username.lower()}"
     if not login_limiter.check(key):
-        raise UnauthorizedError("RATE_LIMITED", "Too many login attempts. Try again later.")
+        raise TooManyRequestsError("RATE_LIMITED", "Too many login attempts. Try again later.")
 
     user = db.query(User).filter(User.username == body.username).first()
     if user is None or not verify_password(body.password, user.password_hash):
