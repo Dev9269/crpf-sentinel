@@ -46,32 +46,32 @@ def evaluate_sequence_rule(
     """Failure(s) followed by success within the window for the same subject."""
     window_seconds = (rule.conditions or {}).get("window", rule.time_window_seconds)
     start = _window_start(window_seconds)
-    subject = event.get(rule.correlation_key or "username")
+    key_field = rule.correlation_key or "username"
+    subject = event.get(key_field)
 
-    failure_count = (
-        db.query(func.count(NormalizedEvent.id))
-        .filter(
-            NormalizedEvent.timestamp >= start,
-            NormalizedEvent.event_id == 4625,
-            NormalizedEvent.timestamp < event["timestamp"],
-        )
-        .scalar()
-        or 0
+    failure_query = db.query(func.count(NormalizedEvent.id)).filter(
+        NormalizedEvent.timestamp >= start,
+        NormalizedEvent.event_id == 4625,
+        NormalizedEvent.timestamp < event["timestamp"],
     )
+    success_query = db.query(func.count(NormalizedEvent.id)).filter(
+        NormalizedEvent.timestamp >= start,
+        NormalizedEvent.event_id == 4624,
+        NormalizedEvent.timestamp >= event["timestamp"] - timedelta(seconds=120),
+    )
+    # Tie the failures/successes to the same subject (e.g. username or source_ip)
+    # as the rule's correlation_key. Without this, any user's failures followed
+    # by any user's success elsewhere in the window triggers the alert.
+    if subject and key_field in {"source_ip", "destination_ip", "username", "hostname", "unit_id", "agent_id"}:
+        failure_query = failure_query.filter(getattr(NormalizedEvent, key_field) == subject)
+        success_query = success_query.filter(getattr(NormalizedEvent, key_field) == subject)
+
+    failure_count = failure_query.scalar() or 0
 
     if failure_count < rule.threshold:
         return False, failure_count, "below failure threshold"
 
-    success_exists = (
-        db.query(func.count(NormalizedEvent.id))
-        .filter(
-            NormalizedEvent.timestamp >= start,
-            NormalizedEvent.event_id == 4624,
-            NormalizedEvent.timestamp >= event["timestamp"] - timedelta(seconds=120),
-        )
-        .scalar()
-        or 0
-    ) > 0
+    success_exists = (success_query.scalar() or 0) > 0
 
     matched = success_exists or event["event_id"] == 4624
     reason = (

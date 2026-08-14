@@ -222,7 +222,14 @@ def ingest(
     new_alert_ids: list[str] = []
 
     for item in body.events:
-        payload = item.raw_xml or item.raw_json or item.model_dump(exclude_none=True)
+        # Prefer the structured event data the agent already normalized.
+        # `raw_xml` is a fallback only when there is no structured payload,
+        # otherwise the shallow XML (e.g. an empty <EventData/>) silently
+        # discards username/source_ip/command_line that detection rules need.
+        if item.data or item.raw_json:
+            payload = item.raw_json or item.model_dump(exclude_none=True)
+        else:
+            payload = item.raw_xml or item.model_dump(exclude_none=True)
         result = ingest_payload(db, payload, agent=agent, unit=unit)
         accepted += result.get("accepted", 0)
         parsed += result.get("parsed", 0)

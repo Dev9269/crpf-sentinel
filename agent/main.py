@@ -22,7 +22,7 @@ from config.settings import Settings
 from parser.windows import normalize
 from spool.spool import Spool
 from transport import Transport
-from utils import os_info, system_metrics
+from utils import local_ip, os_info, system_metrics
 
 log = logging.getLogger("sentinel")
 logging.basicConfig(
@@ -103,9 +103,10 @@ class SentinelAgent:
             if self._flush(chunk):
                 sent += len(chunk)
             else:
-                # server unreachable → put everything (incl. later chunks) back
-                self.spool.append(pending[i:])
-                self._stats["failed"] += len(pending) - sent
+                # server unreachable → put everything (incl. later chunks) back;
+                # only events the spool could not accept are permanently failed
+                kept = self.spool.append(pending[i:])
+                self._stats["failed"] += max(0, len(pending) - sent - kept)
                 return
         self._stats["sent"] += sent
         if sent:
@@ -123,7 +124,7 @@ class SentinelAgent:
         spool_mb = self.spool.size_mb
         metrics = {
             "hostname": self.settings.effective_hostname,
-            "ip_address": self.settings.effective_hostname,
+            "ip_address": local_ip(),
             "os_version": self._os_info["os_version"],
             "agent_version": "1.0.0",
             "events_per_sec": int(self._stats["collected"] / max(1, self.settings.metrics_interval_seconds)),

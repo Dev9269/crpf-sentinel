@@ -14,9 +14,11 @@ from typing import Iterator
 
 try:
     import win32evtlog  # type: ignore
+    import win32evtlogutil  # type: ignore
     HAS_WINEVT = True
 except ImportError:  # pragma: no cover
     win32evtlog = None
+    win32evtlogutil = None
     HAS_WINEVT = False
 
 
