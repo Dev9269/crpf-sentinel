@@ -102,6 +102,12 @@ class Settings:
             except (TypeError, ValueError):
                 return default
 
+        def get_list(name: str, default):
+            raw = get(name, default)
+            if isinstance(raw, list):
+                return list(raw)
+            return [x.strip() for x in str(raw).split(",") if x.strip()]
+
         return cls(
             agent_id=str(get("agent_id", defaults.agent_id)),
             unit_id=get("unit_id", defaults.unit_id),
@@ -111,12 +117,12 @@ class Settings:
             verify_ssl=get_bool("verify_ssl", defaults.verify_ssl),
             connect_timeout=get_float("connect_timeout", defaults.connect_timeout),
             request_timeout=get_float("request_timeout", defaults.request_timeout),
-            channels=list(get("channels", defaults.channels)),
+            channels=get_list("channels", defaults.channels),
             query=get("query", defaults.query),
             max_batch=get_int("max_batch", defaults.max_batch),
             poll_interval_seconds=get_float("poll_interval_seconds", defaults.poll_interval_seconds),
             lookback_seconds=get_int("lookback_seconds", defaults.lookback_seconds),
-            event_id_filter=list(get("event_id_filter", defaults.event_id_filter)),
+            event_id_filter=[int(x) for x in get_list("event_id_filter", defaults.event_id_filter) if x.strip().isdigit()],
             include_raw_xml=get_bool("include_raw_xml", defaults.include_raw_xml),
             metrics_interval_seconds=get_float("metrics_interval_seconds", defaults.metrics_interval_seconds),
             spool_dir=str(get("spool_dir", defaults.spool_dir)),
